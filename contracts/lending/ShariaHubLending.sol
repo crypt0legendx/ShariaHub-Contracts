@@ -73,8 +73,8 @@ contract ShariaHubLending is ShariaHubBase, Ownable, Pausable {
         _;
     }
 
-    modifier onlyOwnerOrLocalNode() {
-        require(localNode == msg.sender || owner() == msg.sender, "must be owner");
+    modifier onlyOwner() {
+        require( owner() == msg.sender, "must be owner");
         _;
     }
 
@@ -113,7 +113,7 @@ contract ShariaHubLending is ShariaHubBase, Ownable, Pausable {
         state = LendingState.Uninitialized;
     }
 
-    function saveInitialParametersToStorage(uint256 _maxDelayDays, uint256 _tier, uint256 _communityMembers, address _community) external onlyOwnerOrLocalNode {
+    function saveInitialParametersToStorage(uint256 _maxDelayDays, uint256 _tier, uint256 _communityMembers, address _community) external onlyOwner {
         require(_maxDelayDays != 0);
         require(state == LendingState.Uninitialized);
         require(_tier > 0);
@@ -154,7 +154,7 @@ contract ShariaHubLending is ShariaHubBase, Ownable, Pausable {
      * After the contribution period ends unsuccesfully, this method enables the contributor
      *  to retrieve their contribution
      */
-    function declareProjectNotFunded() external onlyOwnerOrLocalNode {
+    function declareProjectNotFunded() external onlyOwner {
         require(totalContributed < totalLendingAmount);
         require(state == LendingState.AcceptingContributions);
         require(block.timestamp > fundingEndTime);
@@ -162,7 +162,7 @@ contract ShariaHubLending is ShariaHubBase, Ownable, Pausable {
         emit StateChange(uint(state));
     }
 
-    function declareProjectDefault() external onlyOwnerOrLocalNode {
+    function declareProjectDefault() external onlyOwner {
         require(state == LendingState.AwaitingReturn);
         uint maxDelayDays = getMaxDelayDays();
         require(getDelayDays(block.timestamp) >= maxDelayDays);
@@ -174,13 +174,13 @@ contract ShariaHubLending is ShariaHubBase, Ownable, Pausable {
         emit StateChange(uint(state));
     }
 
-    function setBorrowerReturnEthPerFiatRate(uint256 _borrowerReturnEthPerFiatRate) external onlyOwnerOrLocalNode {
+    function setBorrowerReturnEthPerFiatRate(uint256 _borrowerReturnEthPerFiatRate) external onlyOwner {
         require(state == LendingState.AwaitingReturn);
         borrowerReturnEthPerFiatRate = _borrowerReturnEthPerFiatRate;
         emit onReturnRateSet(borrowerReturnEthPerFiatRate);
     }
 
-    function finishInitialExchangingPeriod(uint256 _initialEthPerFiatRate) external onlyOwnerOrLocalNode {
+    function finishInitialExchangingPeriod(uint256 _initialEthPerFiatRate) external onlyOwner {
         require(capReached == true);
         require(state == LendingState.ExchangingToFiat);
         initialEthPerFiatRate = _initialEthPerFiatRate;
@@ -330,7 +330,7 @@ contract ShariaHubLending is ShariaHubBase, Ownable, Pausable {
         return (newTotal, goalReached, excess);
     }
 
-    function sendFundsToBorrower() external onlyOwnerOrLocalNode {
+    function sendFundsToBorrower() external onlyOwner {
       //Waiting for Exchange
         require(state == LendingState.AcceptingContributions);
         require(capReached);

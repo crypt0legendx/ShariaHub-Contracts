@@ -18,7 +18,7 @@ contract ShariaHubCMC is ShariaHubBase, Ownable {
         uint256 created                                         // Creation timestamp
     );
 
-    modifier onlyOwnerOrLocalNode() {
+    modifier onlyOwner() {
         bool isLocalNode = ShariaHubStorage.getBool(keccak256(abi.encodePacked("user", "localNode", msg.sender)));
         require(isLocalNode || owner() == msg.sender);
         _;
@@ -29,7 +29,7 @@ contract ShariaHubCMC is ShariaHubBase, Ownable {
         version = 1;
     }
 
-    function addNewLendingContract(address _lendingAddress) public onlyOwnerOrLocalNode {
+    function addNewLendingContract(address _lendingAddress) public onlyOwner {
         require(_lendingAddress != address(0));
         ShariaHubStorage.setAddress(keccak256(abi.encodePacked("contract.address", _lendingAddress)), _lendingAddress);
     }
