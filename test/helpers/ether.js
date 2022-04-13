@@ -1,3 +1,8 @@
+const {
+    BN
+} = require('@openzeppelin/test-helpers');
+const utils = require("web3-utils");
+
 export default function ether(n) {
-  return new web3.BigNumber(web3.toWei(n, 'ether'))
+    return new BN(utils.toWei(n.toString(), 'ether'));
 }

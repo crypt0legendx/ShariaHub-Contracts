@@ -1,17 +1,15 @@
-![ShariaHub Logo](https://storage.googleapis.com/general-material/banner3.png)
+![ShariaHub Logo](https://s3-eu-west-1.amazonaws.com/Shariahub-media/git-readme/banner3.png)
 
-# :warning: :warning: :rocket: :rocket: ATTENTION :rocket: :rocket: :warning: :warning:
-
-We moved our repos to Gitlab. This repo is not going to be updated. If you want to see the work continue, contribute, learn... [Come with us there](https://gitlab.com/ShariaHub/platform-contracts.git)!
-
-# ShariaHub Alpha Contracts
+# ShariaHub Platform Contracts
 The backbone of ShariaHub's Shariaal Crowdlending Platform.
 
 Developed with [Truffle Framework](https://truffleframework.com/)
 
+
+
 ## Install
 ```
-git clone https://github.com/ShariaHub/platform-contracts
+git clone https://gitlab.com/ShariaHub/platform-contracts
 cd platform-contracts
 npm install
 ```
@@ -23,7 +21,7 @@ test
 ```
 Since the integration tests and some unit tests are ether intensive, repetitive runs of the whole suit could deplete the test ether. As an alternative:
 
-### All tests in TestRPC with more Eth preloaded
+### All tests in Ganache-cli with more Eth preloaded
 Run:
 ```
 ./scripts/test.sh
@@ -37,6 +35,11 @@ Run:
 and follow the console instructions to run one test suite
 
 # Architecture
+
+At this point in the development, we are migrating from our original architecture (Hub & Spoke) to an upgradeable system using [OpenZeppelin SDK](https://openzeppelin.com/sdk/) implementation of [Proxy Contracts](https://blog.openzeppelin.com/proxy-patterns/)
+
+# Original Architecture
+
 Inspired by [RocketPool's Hub&Spoke architecture](https://medium.com/rocket-pool/upgradable-solidity-contract-design-54789205276d), we use a network of contracts that will allow us to have:
 
 - Reasonable contract upgradeability (for our alpha's project posting schedule)
@@ -44,7 +47,7 @@ Inspired by [RocketPool's Hub&Spoke architecture](https://medium.com/rocket-pool
 - Flexible role based access control
 - [K.I.S.S](https://en.wikipedia.org/wiki/KISS_principle)
 
-![ShariaHub contract architecture ](https://storage.googleapis.com/general-material/alpha_contracts_architecture.png)
+![ShariaHub contract architecture ](https://s3-eu-west-1.amazonaws.com/Shariahub-media/git-readme/contract_architecture.png)
 
 ## [Storage](./contracts/storage/ShariaHubStorage.sol)
 
@@ -106,14 +109,42 @@ Each lending contracts corresponds to a project. Holds the logic for the crowdle
 
 The simplified state machine is:
 
-![ShariaHub Lending state machine](https://storage.googleapis.com/general-material/simplified_lending_state_machine.png)
+![ShariaHub Lending state machine](https://s3-eu-west-1.amazonaws.com/Shariahub-media/git-readme/simplified_lending_state_machine.png)
 
 Lenders, borrowers and local nodes interact with these contracts through [ShariaHub's Platform](https://mvp.Shariahub.com).
 
+## [Arbitrage](./contracts/reputation/ShariaHubArbitrage.sol)
+In emergency cases, ShariaHub could appoint an special role to be able to change a borrower or investor address in a lending contract, or extract funds locked in the contract (with the conditions that all of the contributors, local node and team get their share first). This contract will be able to appoint that role. In the future the owner of this contract could be owned by a voting/governance token to keep the appointment of arbiters decentralized.
+
+# Next Architecture
+
+## Storage
+**Newer contracts will be less and less dependant on Storage**, since ProxyPatterns allows updates in logic maintaining state.
+
+Thus, User and Contract Managers will have their own state, and will be able to be referred by LendingContracts without Storage references
+
+## Reputation
+
+**On Chain Reputation is being phased out**. The reasons are:
+1. Algorithm is difficult to understand by the users.
+2. Ethereum updates makes all the state storage and extra computation expensive for users and the platform.
+
+**The Reputation Contract will live until the currently deployed loans are repayed, to not break them.**
+
+An similar off chain algorithm based in on chain payment history will be used instead.
+
+## [DepositManager](./contracts/deposit/ShariaHubDepositManager.sol)
+
+Since **we are migrating the Lending contracts to [use a stable ERC20 token (DAI)](https://makerdao.com/) instead of ETH**, having the users paying accept transactions on every loan would seriously impact the UX.
+
+To fix this, all contributions will be made vía DepositManager (so, only 1 accept transaction). This contract acts as a proxy to send funds to the desired Loan. In next versions, this contract will hold all deposit functionality, leaving the lending contracts as mere token vaults.
 
 
+# [Gas Station Network](https://gasstation.network/)
 
+In order to provide Metatransactions for our users, we are integrating Gas Station Network.
 
+**Huge thanks to the OpenZeppelin team, MetaCartel and the rest of the people that developed this concept**
 
 ## License
 [GPL V3](https://www.gnu.org/licenses/gpl-3.0.txt)

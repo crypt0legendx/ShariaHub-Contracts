@@ -1,5 +1,4 @@
-//SPDX-License-Identifier: MIT
-
+// SPDX-License-Identifier: gpl-3.0
 pragma solidity ^0.8.9;
 
 
@@ -8,10 +7,10 @@ pragma solidity ^0.8.9;
  * Thanks RocketPool!
  * https://github.com/rocket-pool/rocketpool/blob/master/contracts/interface/RocketStorageInterface.sol
  */
-interface ShariaHubStorageInterface {
+interface IShariaHubStorage {
 
     //modifier for access in sets and deletes
-    // modifier onlyEthicHubContracts() {_;}
+    // modifier onlyShariaHubContracts() {_;}
 
     // Setters
     function setAddress(bytes32 _key, address _value) external;

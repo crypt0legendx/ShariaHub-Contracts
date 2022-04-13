@@ -7,59 +7,87 @@ set -o errexit
 trap cleanup EXIT
 
 cleanup() {
-  # Kill the testrpc instance that we started (if we started one and if it's still running).
-  if [ -n "$testrpc_pid" ] && ps -p $testrpc_pid > /dev/null; then
-    kill -9 $testrpc_pid
+  # Kill the GSN relay server that we started (if we started one and if it's still running).
+  if [ -n "$gsn_relay_server_pid" ] && ps -p $gsn_relay_server_pid > /dev/null; then
+    kill $gsn_relay_server_pid
+  fi
+
+  # Kill the ganache instance that we started (if we started one and if it's still running).
+  if [ -n "$ganache_pid" ] && ps -p $ganache_pid > /dev/null; then
+    kill -9 $ganache_pid
   fi
 }
 
 if [ "$SOLIDITY_COVERAGE" = true ]; then
-  testrpc_port=8555
+  ganache_port=8555
 else
-  testrpc_port=8545
+  ganache_port=8545
 fi
 
-testrpc_running() {
-  nc -z localhost "$testrpc_port"
+relayer_port=8099
+relayer_url="http://localhost:${relayer_port}"
+
+ganache_running() {
+  nc -z localhost "$ganache_port"
 }
 
-start_testrpc() {
-  # We define 10 accounts with balance 1M ether, needed for high-value tests.
+start_ganache() {
+  # We define 12 accounts with balance 10M ether, needed for high-value tests.
   local accounts=(
-    --account="0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501200,1000000000000000000000000"
-    --account="0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501201,1000000000000000000000000"
-    --account="0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501202,1000000000000000000000000"
-    --account="0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501203,1000000000000000000000000"
-    --account="0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501204,1000000000000000000000000"
-    --account="0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501205,1000000000000000000000000"
-    --account="0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501206,1000000000000000000000000"
-    --account="0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501207,1000000000000000000000000"
-    --account="0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501208,1000000000000000000000000"
-    --account="0x2bdd21761a483f71054e14f5b827213567971c676928d9a1808cbfa4b7501209,1000000000000000000000000"
+    --account="0xd999042bfc9743927b214d2a9be92e32320edffb2457f2c77e51ed1bd6539c00,1000000000000000000000000"
+    --account="0xd999042bfc9743927b214d2a9be92e32320edffb2457f2c77e51ed1bd6539c01,1000000000000000000000000"
+    --account="0xd999042bfc9743927b214d2a9be92e32320edffb2457f2c77e51ed1bd6539c02,1000000000000000000000000"
+    --account="0xd999042bfc9743927b214d2a9be92e32320edffb2457f2c77e51ed1bd6539c03,1000000000000000000000000"
+    --account="0xd999042bfc9743927b214d2a9be92e32320edffb2457f2c77e51ed1bd6539c04,1000000000000000000000000"
+    --account="0xd999042bfc9743927b214d2a9be92e32320edffb2457f2c77e51ed1bd6539c05,1000000000000000000000000"
+    --account="0xd999042bfc9743927b214d2a9be92e32320edffb2457f2c77e51ed1bd6539c06,1000000000000000000000000"
+    --account="0xd999042bfc9743927b214d2a9be92e32320edffb2457f2c77e51ed1bd6539c07,1000000000000000000000000"
+    --account="0xd999042bfc9743927b214d2a9be92e32320edffb2457f2c77e51ed1bd6539c08,1000000000000000000000000"
+    --account="0xd999042bfc9743927b214d2a9be92e32320edffb2457f2c77e51ed1bd6539c09,1000000000000000000000000"
+    --account="0xd999042bfc9743927b214d2a9be92e32320edffb2457f2c77e51ed1bd6539c10,1000000000000000000000000"
+    --account="0xd999042bfc9743927b214d2a9be92e32320edffb2457f2c77e51ed1bd6539c11,1000000000000000000000000"
+    --account="0x956b91cb2344d7863ea89e6945b753ca32f6d74bb97a59e59e04903ded14ad00,1000000000000000000000000"
+    --account="0x956b91cb2344d7863ea89e6945b753ca32f6d74bb97a59e59e04903ded14ad01,1000000000000000000000000"
+    --account="0x956b91cb2344d7863ea89e6945b753ca32f6d74bb97a59e59e04903ded14ad02,1000000000000000000000000"
   )
 
   if [ "$SOLIDITY_COVERAGE" = true ]; then
-    node_modules/.bin/testrpc-sc --gasLimit 0xfffffffffff --port "$testrpc_port" "${accounts[@]}" > /dev/null &
+    npx ganache-cli-coverage --gasLimit 0xfffffffffff --port "$ganache_port" "${accounts[@]}" > /dev/null &
   else
-    node_modules/.bin/testrpc --gasLimit 0xfffffffffff "${accounts[@]}" > /dev/null &
+    npx ganache-cli --gasLimit 0xfffffffffff --port "$ganache_port" "${accounts[@]}" > /dev/null &
   fi
 
-  testrpc_pid=$!
+  echo "Waiting for ganache to launch on port "$ganache_port"..."
+
+  while ! ganache_running; do
+    sleep 0.1 # wait for 1/10 of the second before check again
+  done
+
+  ganache_pid=$!
 }
 
-if testrpc_running; then
-  echo "Using existing testrpc instance"
+setup_gsn_relay() {
+  echo "Launching GSN relay server"
+  gsn_relay_server_pid=$(npx oz-gsn run-relayer --ethereumNodeURL http://localhost:$ganache_port --port $relayer_port --detach --quiet)
+  
+  echo "GSN relay server launched!"
+}
+
+if ganache_running; then
+  echo "Using existing ganache instance"
 else
-  echo "Starting our own testrpc instance"
-  start_testrpc
+  echo "Starting our own ganache instance"
+  start_ganache
 fi
 
+# setup_gsn_relay
+
 if [ "$SOLIDITY_COVERAGE" = true ]; then
-  node_modules/.bin/solidity-coverage
+  npx solidity-coverage
 
   if [ "$CONTINUOUS_INTEGRATION" = true ]; then
-    cat coverage/lcov.info | node_modules/.bin/coveralls
+    cat coverage/lcov.info | npx coveralls
   fi
 else
-  node_modules/.bin/truffle test "$@"
+  npx truffle test --debug "$@"
 fi

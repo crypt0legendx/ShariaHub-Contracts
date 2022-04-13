@@ -63,9 +63,17 @@ typings/
 # virtualenv for node
 .node_env
 
+# virtualenv for python
+.venv
+
+
 # vim swap files
 *.swp
 *.swo
 
-package-lock.json
 build/
+
+# OpenZeppelin SDK
+.openzeppelin/dev-*.json
+.openzeppelin/.session
+data/

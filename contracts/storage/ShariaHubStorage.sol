@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.8.13;
 
-//import "../ownership/Ownable.sol";
+pragma solidity ^0.8.9;
 
 /**
  * @title ShariaHubStorage
@@ -23,11 +22,11 @@ contract ShariaHubStorage {
     /// @dev Only allow access from the latest version of a contract in the Rocket Pool network after deployment
     modifier onlyShariaHubContracts() {
         // Maje sure the access is permitted to only contracts in our Dapp
-        require(addressStorage[keccak256(abi.encodePacked("contract.address", msg.sender))] != address(0x0));
+        require(address(addressStorage[keccak256(abi.encodePacked("contract.address", msg.sender))]) != address(0));
         _;
     }
 
-    constructor()  {
+    constructor() {
 		addressStorage[keccak256(abi.encodePacked("contract.address", msg.sender))] = msg.sender;
     }
 
@@ -76,12 +75,12 @@ contract ShariaHubStorage {
 	}
 
 	/// @param _key The key for the record
-	function setString(bytes32 _key, string memory _value) onlyShariaHubContracts external {
+	function setString(bytes32 _key, string calldata _value) onlyShariaHubContracts external {
 		stringStorage[_key] = _value;
 	}
 
 	/// @param _key The key for the record
-	function setBytes(bytes32 _key, bytes memory _value) onlyShariaHubContracts external {
+	function setBytes(bytes32 _key, bytes calldata _value) onlyShariaHubContracts external {
 		bytesStorage[_key] = _value;
 	}
 

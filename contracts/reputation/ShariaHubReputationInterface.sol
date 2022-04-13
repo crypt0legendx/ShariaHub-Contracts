@@ -1,9 +1,10 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+
+pragma solidity ^0.8.9;
 
 interface ShariaHubReputationInterface {
-//    modifier onlyUsersContract(){_;}
-//    modifier onlyLendingContract(){_;}
+    // modifier onlyUsersContract(){_;}
+    // modifier onlyLendingContract(){_;}
     function burnReputation(uint delayDays)  external;
     function incrementReputation(uint completedProjectsByTier)  external;
     function initLocalNodeReputation(address localNode)  external;

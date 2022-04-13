@@ -1,24 +1,23 @@
-pragma solidity ^0.4.20;
+pragma solidity 0.5.13;
 
-import '../../contracts/storage/ShariaHubStorageInterface.sol';
+import '../storage/ShariaHubStorageInterface.sol';
 
 contract MockStorage is ShariaHubStorageInterface {
 
     /**** Storage Types *******/
 
-    mapping(bytes32 => uint256)    private uIntStorage;
-    mapping(bytes32 => string)     private stringStorage;
-    mapping(bytes32 => address)    private addressStorage;
-    mapping(bytes32 => bytes)      private bytesStorage;
-    mapping(bytes32 => bool)       private boolStorage;
-    mapping(bytes32 => int256)     private intStorage;
+    mapping(bytes32 => uint256) private uIntStorage;
+    mapping(bytes32 => string) private stringStorage;
+    mapping(bytes32 => address) private addressStorage;
+    mapping(bytes32 => bytes) private bytesStorage;
+    mapping(bytes32 => bool) private boolStorage;
+    mapping(bytes32 => int256) private intStorage;
 
     /// @dev constructor
-    function MockStorage() public {
+    constructor() public {
         // Set the main owner upon deployment
-        boolStorage[keccak256("access.role", "owner", msg.sender)] = true;
+        boolStorage[keccak256(abi.encodePacked("access.role", "owner", msg.sender))] = true;
     }
-
 
     /**** Get Methods ***********/
 
@@ -34,12 +33,12 @@ contract MockStorage is ShariaHubStorageInterface {
     }
 
     /// @param _key The key for the record
-    function getString(bytes32 _key) external view returns (string) {
+    function getString(bytes32 _key) external view returns (string memory) {
         return stringStorage[_key];
     }
 
     /// @param _key The key for the record
-    function getBytes(bytes32 _key) external view returns (bytes) {
+    function getBytes(bytes32 _key) external view returns (bytes memory) {
         return bytesStorage[_key];
     }
 
@@ -68,12 +67,12 @@ contract MockStorage is ShariaHubStorageInterface {
     }
 
     /// @param _key The key for the record
-    function setString(bytes32 _key, string _value) external {
+    function setString(bytes32 _key, string calldata _value) external {
         stringStorage[_key] = _value;
     }
 
     /// @param _key The key for the record
-    function setBytes(bytes32 _key, bytes _value) external {
+    function setBytes(bytes32 _key, bytes calldata _value) external {
         bytesStorage[_key] = _value;
     }
 
@@ -118,7 +117,4 @@ contract MockStorage is ShariaHubStorageInterface {
     function deleteInt(bytes32 _key) external {
         delete intStorage[_key];
     }
-
-
-
 }

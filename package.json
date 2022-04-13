@@ -1,27 +1,17 @@
 {
   "name": "Shariahub_platform",
-  "version": "0.1.0",
+  "version": "0.1.8",
   "description": "Smart contracts of the ShariaHub platform",
   "scripts": {
     "test": "scripts/test.sh",
-    "console": "truffle console",
-    "coverage": "scripts/coverage.sh"
-  },
-  "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-stage-2": "^6.24.1",
-    "chai": "^4.1.2",
-    "chai-as-promised": "^7.1.1",
-    "chai-bignumber": "^2.0.2",
-    "ethereumjs-testrpc": "^6.0.2",
-    "solidity-coverage": "^0.4.0",
-    "truffle": "^4.1.7",
-    "truffle-hdwallet-provider": "0.0.3"
+    "console": "truffle develop",
+    "compile": "oz compile",
+    "coverage": "scripts/coverage.sh",
+    "upgrade": "oz update"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ShariaHub/platform-contracts.git"
+    "url": "git+https://gitlab.com/ShariaHub/platform-contracts.git"
   },
   "keywords": [
     "Shariahub",
@@ -34,14 +24,45 @@
   "author": "ShariaHub Dev Team: Raúl Martínez, Quijion Jiang, Diego Pardilla",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/ShariaHub/platform-contracts/issues"
+    "url": "https://gitlab.com/ShariaHub/platform-contracts/issues"
   },
-  "homepage": "https://github.com/ShariaHub/platform-contracts#readme",
+  "homepage": "https://gitlab.com/ShariaHub/platform-contracts#readme",
   "dependencies": {
+    "@babel/polyfill": "^7.2.5",
+    "@nomiclabs/hardhat-solhint": "^2.0.0",
+    "@openzeppelin/contracts": "^4.3.1",
+    "@poanet/solidity-flattener": "^3.0.6",
+    "caniuse-lite": "^1.0.30001255",
+    "eth-json-rpc-filters": "^4.1.1",
+    "hardhat": "^2.6.3"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.15.5",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/register": "^7.15.3",
+    "@nomiclabs/hardhat-truffle5": "^2.0.0",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/cli": "^2.6.0",
+    "@openzeppelin/contracts-ethereum-package": "^2.4.0",
+    "@openzeppelin/gsn-helpers": "^0.2.3",
+    "@openzeppelin/gsn-provider": "^0.1.9",
+    "@openzeppelin/test-helpers": "^0.5.4",
+    "@openzeppelin/upgrades": "^2.6.0",
+    "@truffle/hdwallet-provider": "^1.0.23",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "chai-bignumber": "^3.0.0",
+    "chai-bn": "^0.2.0",
     "dotenv": "^5.0.1",
-    "openzeppelin-solidity": "1.10.0",
+    "ganache-cli": "^6.7.0",
+    "solidity-coverage": "^0.5.0",
     "temp": "^0.8.3",
-    "truffle-artifactor": "^3.0.2",
-    "web3": "^1.0.0-beta.27"
+    "truffle": "^5.1.7",
+    "truffle-assertions": "^0.9.2",
+    "truffle-privatekey-provider": "^1.5.0",
+    "web3": "^1.2.1",
+    "web3-utils": "^1.2.2"
   }
 }

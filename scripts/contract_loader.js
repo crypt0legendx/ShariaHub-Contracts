@@ -2,17 +2,18 @@
 var temp = require("temp").track();
 const path = require('path');
 
-module.exports =  {
-    load: async function(web3, contractName, deployedAddress ) {
-
-
-        const jsonPath = path.join(__dirname,`../build/contracts/${contractName}.json`);
+module.exports = {
+    load: async function (web3, contractName, deployedAddress) {
+        const jsonPath = path.join(__dirname, `../build/contracts/${contractName}.json`);
         const contract_data = require(jsonPath);
         if (contract_data === undefined) {
             throw Error(`No contract named ${contractName} in ${jsonPath}`);
         }
         if (deployedAddress === undefined) {
             const netId = await web3.eth.net.getId();
+            if (contract_data.networks[netId] === undefined) {
+                throw Error(`${jsonPath} does not have a deployed address in network ${netId}`);
+            }
             deployedAddress = contract_data.networks[netId].address;
 
         }
@@ -25,8 +26,9 @@ module.exports =  {
 
     },
 
-    getContractWrapper: function(web3, contractName) {
-        const jsonPath = path.join(__dirname,`../build/contracts/${contractName}.json`);
+    getContractWrapper: function (web3, contractName) {
+        const jsonPath = path.join(__dirname, `../build/contracts/${contractName}.json`);
+
         const contract_data = require(jsonPath);
         if (contract_data === undefined) {
             throw Error(`No contract named ${contractName} in ${jsonPath}`);
@@ -36,10 +38,9 @@ module.exports =  {
         });
     },
 
+    getDeployable: function (web3, contractName) {
 
-    getDeployable: function(web3, contractName) {
-
-        const jsonPath = path.join(__dirname,`../build/contracts/${contractName}.json`);
+        const jsonPath = path.join(__dirname, `../build/contracts/${contractName}.json`);
         const contract_data = require(jsonPath);
         if (contract_data === undefined) {
             throw Error(`No contract named ${contractName} in ${jsonPath}`);
